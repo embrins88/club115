@@ -1,41 +1,33 @@
 from __future__ import annotations
 
-from servers.models.server import Server
-from servers.models.sync_result import SyncResult
-from servers.services.comparison_service import ComparisonService
+from servers.models.workflow_result import SyncWorkflowResult
+from servers.services.server_config import get_server
+from servers.workflows.sync_workflow import SyncWorkflow
 
 
 class SyncService:
-    """Synchronize local Minecraft files to a remote server."""
+    """Public interface for previewing and running server synchronization."""
 
-    def __init__(self, server: Server) -> None:
-        self.server = server
+    def preview(self, server_id: str) -> SyncWorkflowResult:
+        """Preview synchronization without modifying the server."""
 
-    def run(self) -> SyncResult:
-        """Compare files and refuse to continue if comparison fails."""
+        server = get_server(server_id)
 
-        result = SyncResult(server_name=self.server.name)
-
-        comparison_service = ComparisonService(self.server)
-        comparison = comparison_service.run()
-
-        if comparison.errors:
-            result.errors.extend(comparison.errors)
-            result.messages.append(
-                "Sync stopped because the comparison failed."
-            )
-            return result
-
-        if not comparison.has_changes:
-            result.messages.append("No changes detected.")
-            result.server_verified = True
-            return result
-
-        result.messages.append(
-            f"Ready to sync {comparison.total_changes} change(s)."
+        workflow = SyncWorkflow(
+            server,
+            dry_run=True,
         )
 
-        # Actual backup, stop, upload, delete, restart, and verification
-        # will be added next.
+        return workflow.run()
 
-        return result
+    def sync(self, server_id: str) -> SyncWorkflowResult:
+        """Run a live synchronization workflow."""
+
+        server = get_server(server_id)
+
+        workflow = SyncWorkflow(
+            server,
+            dry_run=False,
+        )
+
+        return workflow.run()

@@ -1,0 +1,9 @@
+{
+  "server_name": "Yikes",
+  "server_host": "192.168.0.64",
+  "server_user": "subtext42",
+  "minecraft_mods_path": "/home/subtext42/minecraft/server/mods",
+  "client_mods_path": "C:/Users/Feini/curseforge/minecraft/Instances/MODest Effort/mods",
+  "bluemap_url": "http://192.168.0.64:8100",
+  "cockpit_url": "https://192.168.0.64:9090"
+}
