@@ -1,0 +1,56 @@
+version: 1
+
+ssh:
+  host: 192.168.0.64
+  user: subtext42
+  key: ~/.ssh/id_ed25519
+
+servers:
+  homestead:
+    name: Homestead
+
+    local:
+      instance: "C:/Users/Feini/curseforge/minecraft/Instances/MODest Effort"
+
+    remote:
+      root: "/home/subtext42/minecraft/server"
+
+    service: minecraft
+    game_port: 25565
+    rcon_port: 25575
+
+    world:
+      name: Yikes
+
+    sync:
+      directories:
+        - mods
+        - config
+        - defaultconfigs
+
+      preserve:
+        - "mods/bluemap-*.jar"
+        - "config/bluemap/**"
+
+      ignore:
+        - "**/*.bak"
+        - "**/*.disabled"
+        - "resourcepacks/**"
+        - "config/ferritecore-mixin.toml"
+        - "config/fml.toml"
+
+  cottage:
+    name: Cottage
+
+    local:
+      instance: "D:/CurseForge/Instances/Cottage Witch"
+
+    remote:
+      root: "/opt/minecraft/cottage"
+
+    service: minecraft-cottage
+    game_port: 25566
+    rcon_port: 25576
+
+    world:
+      name: ""

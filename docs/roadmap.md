@@ -30,7 +30,7 @@ The repository is organized, documented, version controlled, and ready to receiv
 
 ---
 
-## Milestone 2 — Desktop Application (`v0.2.x`)
+## Milestone 2 — Desktop Foundation (`v0.2.x`)
 
 ### Goal
 
@@ -38,11 +38,10 @@ Move the existing desktop application into the repository and make it runnable f
 
 ### Tasks
 
-- [ ] Review existing desktop app files
 - [ ] Move source code into `desktop/`
-- [ ] Remove obsolete files
-- [ ] Organize pages, services, components, and assets
-- [ ] Verify the application runs
+- [ ] Clean project structure
+- [ ] Get desktop app running
+- [ ] Match CLub 115 branding
 - [ ] Document setup instructions
 
 ### Definition of Done
@@ -51,7 +50,27 @@ The desktop application runs from the repository and has a clean, understandable
 
 ---
 
-## Milestone 3 — Core Infrastructure Features (`v0.3.x`)
+## Milestone 3 — Member Agent (v0.3.x)
+
+### Goal
+
+Create a reliable Windows Member Agent capable of receiving commands from Club 115.
+
+### Tasks
+
+- [x] Polling
+- [x] Message delivery
+- [x] Lock workstation
+- [x] Automatic startup
+- [x] Background execution
+- [x] Logging
+- [x] Queue support
+- [ ] Installer
+- [ ] Auto-update
+
+---
+
+## Milestone 4 — Core Infrastructure Features (`v0.3.x`)
 
 ### Goal
 
@@ -72,7 +91,7 @@ Club 115 can perform useful infrastructure management tasks in the homelab.
 
 ---
 
-## Milestone 4 — Web Interface (`v0.4.x`)
+## Milestone 5 — Web Interface (`v0.4.x`)
 
 ### Goal
 
@@ -91,7 +110,7 @@ The web interface exists as a working prototype.
 
 ---
 
-## Milestone 5 — Unified Platform (`v0.5.x`)
+## Milestone 6 — Unified Platform (`v0.5.x`)
 
 ### Goal
 
@@ -111,7 +130,7 @@ Desktop and web interfaces feel like two views of the same system.
 
 ---
 
-## Milestone 6 — Polish (`v0.9.x`)
+## Milestone 7 — Polish (`v0.9.x`)
 
 ### Goal
 
