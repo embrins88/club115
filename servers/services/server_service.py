@@ -6,6 +6,7 @@ from unittest import result
 
 from matplotlib import lines
 from servers.models import server
+from servers.services import status
 from servers.services.ssh_service import SSHService
 
 from servers.models.server import Server
@@ -34,18 +35,16 @@ class ServerControlService:
         self.ssh = SSHService(server)
 
     def get_status(self) -> ServiceStatus:
-        """Return the current systemd service state."""
-
-        service = shlex.quote(self.server.service)
+        unit = shlex.quote(self._unit_name())
 
         command = (
             "systemctl show "
-            f"{service} "
-            "--property=LoadState "
-            "--property=ActiveState "
-            "--property=SubState "
-            "--value"
-        )
+                f"{unit} "
+                "--property=LoadState "
+                "--property=ActiveState "
+                "--property=SubState "
+                "--value"
+            )
 
         output = self._run_command(command)
         lines = output.splitlines()
@@ -53,14 +52,14 @@ class ServerControlService:
         if len(lines) < 3:
             raise RuntimeError(
                 f"Unexpected status response for "
-                f"{self.server.service}: {output!r}"
+                f"{self._unit_name()}: {output!r}"
             )
 
         load_state = lines[0].strip()
 
         if load_state != "loaded":
             raise RuntimeError(
-                f"Service '{self.server.service}' is not loaded."
+                f"Service '{self._unit_name()}' is not loaded."
             )
 
         return ServiceStatus(
@@ -69,38 +68,34 @@ class ServerControlService:
         )
 
     def stop(self) -> ServiceStatus:
-        """Stop the configured server service."""
-
-        service = shlex.quote(self.server.service)
+        unit = shlex.quote(self._unit_name())
 
         self._run_command(
-            f"sudo -n systemctl stop {service}"
+            f"sudo -n systemctl stop {unit}"
         )
 
         status = self.get_status()
 
         if status.active_state != "inactive":
             raise RuntimeError(
-                f"{self.server.service} did not stop cleanly. "
+                f"{self._unit_name()} did not stop cleanly. "
                 f"State: {status.active_state}/{status.sub_state}"
             )
 
         return status
 
     def start(self) -> ServiceStatus:
-        """Start the configured server service."""
-
-        service = shlex.quote(self.server.service)
+        unit = shlex.quote(self._unit_name())
 
         self._run_command(
-            f"sudo -n systemctl start {service}"
+            f"sudo -n systemctl start {unit}"
         )
 
         status = self.get_status()
 
         if not status.is_running:
             raise RuntimeError(
-                f"{self.server.service} did not start cleanly. "
+                f"{self._unit_name()} did not start cleanly. "
                 f"State: {status.active_state}/{status.sub_state}"
             )
 
@@ -111,3 +106,6 @@ class ServerControlService:
 
         result = self.ssh.run(command)
         return result.stdout
+    
+    def _unit_name(self) -> str:
+        return f"{self.server.service}.service"

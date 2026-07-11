@@ -268,9 +268,13 @@ class MinecraftPage(ctk.CTkFrame):
             try:
                 task()
             except Exception as error:
+                error_message = str(error)
+
                 self.after(
                     0,
-                    lambda: self.log(f"ERROR: {error}"),
+                    lambda message=error_message: self.log(
+                        f"ERROR: {message}"
+                    ),
                 )
             finally:
                 self.after(
