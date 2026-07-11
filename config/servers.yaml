@@ -13,9 +13,9 @@ servers:
       instance: "C:/Users/Feini/curseforge/minecraft/Instances/MODest Effort"
 
     remote:
-      root: "/home/subtext42/minecraft/server"
+      root: "/home/subtext42/minecraft/homestead"
 
-    service: minecraft
+    service: minecraft-homestead
     game_port: 25565
     rcon_port: 25575
 
