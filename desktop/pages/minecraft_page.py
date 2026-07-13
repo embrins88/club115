@@ -19,7 +19,7 @@ from servers.services.sync_service import SyncService
 class MinecraftPage(ctk.CTkFrame):
     """Minecraft server management page."""
 
-    SERVER_ID = "homestead"
+    SERVER_ID = "kindling"
 
     def __init__(self, parent, app):
         super().__init__(parent, fg_color=COLORS["bg"])

@@ -39,7 +39,7 @@ servers:
         - "config/ferritecore-mixin.toml"
         - "config/fml.toml"
 
-  cottage:
+  kindling:
     name: Kindling
 
     local:
@@ -72,3 +72,4 @@ servers:
         - "resourcepacks/**"
         - "config/ferritecore-mixin.toml"
         - "config/fml.toml"
+        - "mods/fallingleaves-*.jar"
