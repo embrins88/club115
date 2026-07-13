@@ -11,21 +11,28 @@ from desktop.theme import COLORS, FONTS
 
 from servers.services.comparison_service import ComparisonService
 from servers.services.server_config import get_server
-from servers.services.server_service import ServerControlService
+from servers.services.server_config import get_server, get_servers
 from servers.services.ssh_service import SSHService
 from servers.services.sync_service import SyncService
+from servers.services.server_control_service import ServerControlService
 
 
 class MinecraftPage(ctk.CTkFrame):
     """Minecraft server management page."""
 
-    SERVER_ID = "kindling"
 
     def __init__(self, parent, app):
         super().__init__(parent, fg_color=COLORS["bg"])
 
         self.app = app
-        self.server = get_server(self.SERVER_ID)
+        self.servers = get_servers()
+        self.server_name_to_id = {
+            server.name: server_id
+                for server_id, server in self.servers.items()
+}
+
+        self.server_id = "homestead"
+        self.server = self.servers[self.server_id]
 
         self.server_service = ServerControlService(self.server)
         self.sync_service = SyncService()
@@ -47,7 +54,7 @@ class MinecraftPage(ctk.CTkFrame):
 
     def _build_header(self) -> None:
         header = ctk.CTkFrame(
-            self,
+        self,
             fg_color=COLORS["panel"],
             corner_radius=12,
         )
@@ -69,22 +76,78 @@ class MinecraftPage(ctk.CTkFrame):
             column=0,
             sticky="w",
             padx=18,
-            pady=(14, 4),
+            pady=14,
         )
 
-        ctk.CTkLabel(
+        self.server_title = ctk.CTkLabel(
             title_area,
             text=f"🎮  {self.server.name}",
             font=FONTS["title"],
             text_color=COLORS["text"],
-        ).grid(row=0, column=0, sticky="w")
+        )
+        self.server_title.grid(
+            row=0,
+            column=0,
+            sticky="w",
+        )
 
-        ctk.CTkLabel(
+        self.world_label = ctk.CTkLabel(
             title_area,
             text=f"World: {self.server.world_name}",
             font=FONTS.get("body", ("Segoe UI", 12)),
             text_color=COLORS.get("muted_text", "#9BA8B0"),
-        ).grid(row=1, column=0, sticky="w", pady=(2, 0))
+        )
+        self.world_label.grid(
+            row=1,
+            column=0,
+            sticky="w",
+            pady=(2, 0),
+        )
+
+        selector_area = ctk.CTkFrame(
+            header,
+            fg_color="transparent",
+        )
+        selector_area.grid(
+            row=0,
+            column=1,
+            sticky="e",
+            padx=18,
+            pady=14,
+        )
+
+        ctk.CTkLabel(
+            selector_area,
+            text="Server",
+            font=FONTS.get("body", ("Segoe UI", 12)),
+            text_color=COLORS.get("muted_text", "#9BA8B0"),
+        ).grid(
+            row=0,
+            column=0,
+            sticky="w",
+            pady=(0, 4),
+        )
+
+        self.server_selector = ctk.CTkOptionMenu(
+            selector_area,
+            values=list(self.server_name_to_id.keys()),
+            command=self.change_server,
+            width=180,
+            height=36,
+            font=FONTS["button"],
+            fg_color=COLORS["button"],
+            button_color=COLORS["button"],
+            button_hover_color=COLORS["button_hover"],
+            dropdown_fg_color=COLORS["panel"],
+            dropdown_hover_color=COLORS["button_hover"],
+            text_color=COLORS["text"],
+        )
+        self.server_selector.grid(
+            row=1,
+            column=0,
+            sticky="e",
+        )
+        self.server_selector.set(self.server.name)
 
         self.status_badge = StatusBadge(header, "unknown")
         self.status_badge.grid(
@@ -241,10 +304,17 @@ class MinecraftPage(ctk.CTkFrame):
         )
 
     def log(self, text: str) -> None:
-        """Append text to the activity panel."""
+        """Append timestamped text to the activity log."""
 
-        self.output.insert("end", text.rstrip() + "\n")
-        self.output.see("end")
+        timestamp = datetime.now().strftime("%H:%M:%S")
+
+        for line in text.rstrip().splitlines():
+            self.output.insert(
+                "end",
+                f"{timestamp}  {line}\n"
+            )
+
+    self.output.see("end")
 
     def clear_log(self) -> None:
         """Clear the activity panel."""
@@ -533,3 +603,37 @@ class MinecraftPage(ctk.CTkFrame):
         )
 
         return result.stdout.strip()
+    
+    def change_server(self, selected_name: str) -> None:
+        """Switch the page to another configured Minecraft server."""
+
+        selected_id = self.server_name_to_id[selected_name]
+
+        if selected_id == self.server_id:
+            return
+
+        self.server_id = selected_id
+        self.server = self.servers[selected_id]
+
+        self.server_service = ServerControlService(self.server)
+        self.ssh = SSHService(self.server)
+
+        self.server_title.configure(
+            text=f"🎮  {self.server.name}"
+        )
+        self.world_label.configure(
+            text=f"World: {self.server.world_name}"
+        )
+
+        self.status_badge.set_status("unknown")
+        self.server_card.set_value("Checking...")
+        self.changes_card.set_value("Checking...")
+        self.checkpoint_card.set_value("Checking...")
+
+        self.clear_log()
+        self.log(f"Switched to {self.server.name}.")
+        self.log(
+            "Use Preview Sync to check for client/server differences."
+        )
+
+        self.refresh_status(run_once=True)

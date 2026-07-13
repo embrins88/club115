@@ -88,3 +88,13 @@ def get_server(server_id: str) -> Server:
             f"Server '{server_id}' is missing required field: "
             f"{missing_field}"
         ) from error
+    
+def get_servers() -> dict[str, Server]:
+    """Return every configured server, keyed by server ID."""
+
+    config = load_config()
+
+    return {
+        server_id: get_server(server_id)
+        for server_id in config["servers"]
+    }
