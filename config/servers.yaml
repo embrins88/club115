@@ -40,17 +40,35 @@ servers:
         - "config/fml.toml"
 
   cottage:
-    name: Cottage
+    name: Kindling
 
     local:
-      instance: "D:/CurseForge/Instances/Cottage Witch"
+      instance: "C:/Users/Feini/curseforge/minecraft/Instances/Kindling"
 
     remote:
-      root: "/opt/minecraft/cottage"
+      root: "/home/subtext42/minecraft/kindling"
 
-    service: minecraft-cottage
+    service: minecraft-kindling
+
     game_port: 25566
     rcon_port: 25576
 
     world:
-      name: ""
+      name: Kindling
+
+    sync:
+      directories:
+        - mods
+        - config
+        - defaultconfigs
+
+      preserve:
+        - "mods/bluemap-*.jar"
+        - "config/bluemap/**"
+
+      ignore:
+        - "**/*.bak"
+        - "**/*.disabled"
+        - "resourcepacks/**"
+        - "config/ferritecore-mixin.toml"
+        - "config/fml.toml"
